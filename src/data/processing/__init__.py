@@ -1,4 +1,1 @@
-import pandas as pd
-
-class DataProcessor
-
+from .data_processor import DataProcessor
