@@ -1,18 +1,16 @@
-import enum
-import pandas as pd
-import numpy as np
-from dataclasses import dataclass
-from typing import Optional, List
-
-import statsmodels.api as sm
+from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass
 class AssignmentConfig:
-    trading_days: int = 252
-    stock_list: List[str] = None
+    """
+    Configuration class for the assignment.
+    """
 
-    def __post_init__(self):
-        if self.stock_list is None:
-            self.stock_list = ["VTRS", "AAPL", "GOOG", "META", "WMT"]
-            self.benchmark_index = "^GSPC"
+    trading_days: int = 252
+    stock_list: List[str] = field(
+        default_factory=lambda: ["AAPL", "MSFT", "GOOGL", "XOM", "INTC"]
+    )
+    benchmark_index: str = "^GSPC"
+    risk_free_rate: float = 0.04
