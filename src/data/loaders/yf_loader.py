@@ -3,10 +3,9 @@ import pandas as pd
 import time
 from loguru import logger
 from typing import List, Union, Optional, Any
-from .base_loader import BaseLoader
 
 
-class YFinanceLoader(BaseLoader):
+class YFinanceLoader:
     def __init__(self, max_retries: int = 3, delay: float = 1.0):
         self.max_retries = max_retries
         self.delay = delay

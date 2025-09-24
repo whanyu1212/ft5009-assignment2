@@ -155,3 +155,33 @@ class PortfolioOptimizer:
                 efficient_portfolios.append({"Return": target, "Volatility": vol})
 
         return pd.DataFrame(efficient_portfolios)
+
+    def calculate_cml(
+        self,
+        max_sharpe_portfolio: pd.Series,
+        results_df: pd.DataFrame,
+        x_axis_padding: float = 1.1,
+    ) -> tuple[list, list]:
+        """
+        Calculates the Capital Market Line (CML).
+
+        Args:
+            max_sharpe_portfolio (pd.Series): The portfolio with the highest Sharpe ratio.
+            results_df (pd.DataFrame): DataFrame with metrics of all simulated portfolios.
+            x_axis_padding (float, optional): The padding to extend the CML on the x-axis.
+                                             Defaults to 1.1.
+
+        Returns:
+            tuple[list, list]: A tuple containing the x and y coordinates for plotting the CML.
+        """
+        max_sharpe_vol = max_sharpe_portfolio["Volatility"]
+        max_sharpe_ret = max_sharpe_portfolio["Return"]
+
+        # The slope of the CML is the Sharpe Ratio of the tangency portfolio
+        cml_slope = (max_sharpe_ret - self.risk_free_rate) / max_sharpe_vol
+
+        cml_x = [0, results_df["Volatility"].max() * x_axis_padding]
+
+        cml_y = [self.risk_free_rate, self.risk_free_rate + cml_slope * cml_x[1]]
+
+        return cml_x, cml_y

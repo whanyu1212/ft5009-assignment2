@@ -1,2 +1,2 @@
-from .base_loader import BaseLoader
 from .yf_loader import YFinanceLoader
+from .ff_loader import FamaFrenchLoader
