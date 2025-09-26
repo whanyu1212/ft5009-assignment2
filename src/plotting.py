@@ -59,6 +59,8 @@ class PlottingUtil:
             "Equal_Weighted_Index",
             "Price_Weighted_Index",
             "SP_500",
+            "Value_Weighted_Index",
+            "Risk_Parity_Index",
         ],
         title: str = "Index Performance Comparison",
         xlabel: str = "Date",

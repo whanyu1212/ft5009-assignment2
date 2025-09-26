@@ -86,7 +86,7 @@ class YFinanceLoader:
                             field: data.get(field, None) for field in fields
                         }
                         # keep the symbol so we can group by it later
-                        filtered_data["symbol"] = ticker
+                        filtered_data["Symbol"] = ticker
                         stock_data.append(filtered_data)
                     else:
                         stock_data.append(data)
