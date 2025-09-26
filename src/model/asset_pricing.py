@@ -4,9 +4,8 @@ import statsmodels.api as sm
 
 
 class AssetPricingModel:
-    def __init__(self, df_returns: pd.DataFrame, risk_free_rate: float):
+    def __init__(self, df_returns: pd.DataFrame):
         self.df_returns = df_returns
-        self.risk_free_rate = risk_free_rate
 
     def fit_capm_model(self):
         """Fits the CAPM model to estimate beta and alpha.
