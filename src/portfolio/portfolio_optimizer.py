@@ -80,10 +80,23 @@ class PortfolioOptimizer:
             float: Portfolio volatility (only 1 item in the series).
         """
 
+        # np.newaxis is used to convert the 1D weights array into a 2D array (1 row, n_assets cols)
         # the objective function just needs to return a single floating-point value
         return self._calculate_portfolio_metrics(weights[np.newaxis, :])[
             "Volatility"
         ].iloc[0]
+
+    def _minimize_sharpe_obj(self, weights: np.ndarray) -> float:
+        """Objective function to minimize the negative Sharpe Ratio.
+
+        Args:
+            weights (np.ndarray): Portfolio weights.
+
+        Returns:
+            float: Negative Sharpe Ratio.
+        """
+        metrics = self._calculate_portfolio_metrics(weights[np.newaxis, :])
+        return -metrics["Sharpe Ratio"].iloc[0]
 
     # === Public methods ===#
 
@@ -185,3 +198,37 @@ class PortfolioOptimizer:
         cml_y = [self.risk_free_rate, self.risk_free_rate + cml_slope * cml_x[1]]
 
         return cml_x, cml_y
+
+    def maximize_sharpe_ratio(self) -> pd.Series:
+        """Finds the optimal portfolio that maximizes the Sharpe Ratio.
+
+        Returns:
+            pd.Series: A Series containing the metrics and weights of the optimal portfolio.
+        """
+
+        constraints = {"type": "eq", "fun": lambda w: np.sum(w) - 1}
+
+        bounds = tuple((0, 1) for _ in range(self.n_assets))
+
+        initial_weights = np.array([1.0 / self.n_assets] * self.n_assets)
+
+        # Run the optimizer to find the weights that minimize the negative Sharpe ratio.
+        result = minimize(
+            self._minimize_sharpe_obj,
+            initial_weights,
+            method="trust-constr",
+            bounds=bounds,
+            constraints=constraints,
+        )
+
+        optimal_weights = result.x
+
+        optimal_metrics = self._calculate_portfolio_metrics(
+            optimal_weights[np.newaxis, :]
+        )
+
+        max_sharpe_portfolio = optimal_metrics.iloc[0].copy()
+        for i, symbol in enumerate(self.returns.columns):
+            max_sharpe_portfolio[f"Weight_{symbol}"] = optimal_weights[i]
+
+        return max_sharpe_portfolio

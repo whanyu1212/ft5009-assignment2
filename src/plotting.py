@@ -172,3 +172,100 @@ class PlottingUtil:
         plt.grid(True, alpha=0.2)
         plt.tight_layout()
         plt.show()
+
+    @staticmethod
+    def plot_full_optimization_results(
+        results_df: pd.DataFrame,
+        efficient_frontier: pd.DataFrame,
+        cml_x: list,
+        cml_y: list,
+        min_vol_portfolio: pd.Series,
+        mc_max_sharpe_portfolio: pd.Series,
+        optimized_max_sharpe_portfolio: pd.Series,
+    ):
+        """
+        Plots the results of portfolio optimization, highlighting the difference
+        between the Monte Carlo and optimized tangency portfolios.
+
+        Args:
+            results_df (pd.DataFrame): DataFrame with portfolio simulation results.
+            efficient_frontier (pd.DataFrame): DataFrame with efficient frontier data.
+            cml_x (list): X-coordinates for the Capital Market Line.
+            cml_y (list): Y-coordinates for the Capital Market Line.
+            min_vol_portfolio (pd.Series): Data for the min volatility portfolio.
+            mc_max_sharpe_portfolio (pd.Series): Data for the max Sharpe portfolio from Monte Carlo.
+            optimized_max_sharpe_portfolio (pd.Series): Data for the max Sharpe portfolio from the optimizer.
+        """
+        sns.set_theme(style="white")
+        plt.figure(figsize=(14, 8))
+
+        # Plot the Monte Carlo simulation cloud
+        sns.scatterplot(
+            data=results_df,
+            x="Volatility",
+            y="Return",
+            hue="Sharpe Ratio",
+            palette="viridis",
+            s=20,
+            alpha=0.5,
+            legend=False,
+        )
+
+        # Plot the Efficient Frontier
+        plt.plot(
+            efficient_frontier["Volatility"],
+            efficient_frontier["Return"],
+            "r--",
+            linewidth=2,
+            label="Efficient Frontier",
+        )
+
+        # Plot the CML (calculated using the *optimized* portfolio)
+        plt.plot(cml_x, cml_y, "b-", linewidth=2, label="Capital Market Line (CML)")
+
+        # Highlight the min volatility portfolio
+        plt.scatter(
+            min_vol_portfolio["Volatility"],
+            min_vol_portfolio["Return"],
+            color="c",
+            marker="X",
+            s=150,
+            edgecolors="black",
+            label="Min Volatility Portfolio",
+        )
+
+        # Highlight the max Sharpe portfolio from Monte Carlo
+        plt.scatter(
+            mc_max_sharpe_portfolio["Volatility"],
+            mc_max_sharpe_portfolio["Return"],
+            color="orange",
+            marker="*",
+            s=250,
+            edgecolors="black",
+            label="Max Sharpe (Monte Carlo Approx.)",
+        )
+
+        # Highlight the *optimized* max Sharpe portfolio (the true tangency portfolio)
+        plt.scatter(
+            optimized_max_sharpe_portfolio["Volatility"],
+            optimized_max_sharpe_portfolio["Return"],
+            color="r",
+            marker="*",
+            s=350,
+            edgecolors="black",
+            label="Max Sharpe (Optimized Tangency)",
+        )
+
+        plt.title(
+            "Portfolio Optimization: Efficient Frontier & CML",
+            fontsize=18,
+            fontweight="bold",
+        )
+        plt.xlabel("Annualized Volatility (Risk)", fontsize=12)
+        plt.ylabel("Annualized Return", fontsize=12)
+        plt.xlim(left=0)
+        plt.ylim(bottom=0)
+        plt.legend(loc="best")
+        plt.grid(True, alpha=0.2)
+        plt.tight_layout()
+        plt.show()
